@@ -1,0 +1,14 @@
+[
+{
+  "directory": "F:/gitclone/bupt_tasks/task1/build",
+  "command": "C:\\PROGRA~2\\mingw64\\bin\\G__~1.EXE  @CMakeFiles/main.dir/includes_CXX.rsp -g -o CMakeFiles\\main.dir\\src\\Calculator.obj -c F:\\gitclone\\bupt_tasks\\task1\\src\\Calculator.cpp",
+  "file": "F:/gitclone/bupt_tasks/task1/src/Calculator.cpp",
+  "output": "CMakeFiles/main.dir/src/Calculator.obj"
+},
+{
+  "directory": "F:/gitclone/bupt_tasks/task1/build",
+  "command": "C:\\PROGRA~2\\mingw64\\bin\\G__~1.EXE  @CMakeFiles/main.dir/includes_CXX.rsp -g -o CMakeFiles\\main.dir\\main.obj -c F:\\gitclone\\bupt_tasks\\task1\\main.cpp",
+  "file": "F:/gitclone/bupt_tasks/task1/main.cpp",
+  "output": "CMakeFiles/main.dir/main.obj"
+}
+]
