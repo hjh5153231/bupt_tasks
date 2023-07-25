@@ -1,0 +1,8 @@
+[
+{
+  "directory": "F:/gitclone/bupt_tasks/task3.1.b/build",
+  "command": "C:\\PROGRA~2\\mingw64\\bin\\G__~1.EXE  @CMakeFiles/main.dir/includes_CXX.rsp -g -o CMakeFiles\\main.dir\\main.cpp.obj -c F:\\gitclone\\bupt_tasks\\task3.1.b\\main.cpp",
+  "file": "F:/gitclone/bupt_tasks/task3.1.b/main.cpp",
+  "output": "CMakeFiles/main.dir/main.cpp.obj"
+}
+]

@@ -1,0 +1,5 @@
+F:/gitclone/bupt_tasks/task3.1.b/build/CMakeFiles/main.dir
+F:/gitclone/bupt_tasks/task3.1.b/build/CMakeFiles/package.dir
+F:/gitclone/bupt_tasks/task3.1.b/build/CMakeFiles/package_source.dir
+F:/gitclone/bupt_tasks/task3.1.b/build/CMakeFiles/edit_cache.dir
+F:/gitclone/bupt_tasks/task3.1.b/build/CMakeFiles/rebuild_cache.dir
