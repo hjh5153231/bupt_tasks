@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(task3.1.b)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/sdl/include)
+link_directories(${PROJECT_SOURCE_DIR}/sdl/lib)
+add_executable(main main.cpp)
+target_link_libraries(main SDL2 SDL2main SDL2_test)

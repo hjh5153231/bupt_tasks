@@ -1,1 +1,1 @@
--IF:/gitclone/bupt_tasks/task3.1.b/include -IF:/gitclone/bupt_tasks/task3.1.b/ffmpeg/include
+-IF:/gitclone/bupt_tasks/task3.1.b/include -IF:/gitclone/bupt_tasks/task3.1.b/ffmpeg/include -IF:/gitclone/bupt_tasks/task3.1.b/sdl/include
