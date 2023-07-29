@@ -38,6 +38,7 @@ int main(){
     string s_filepath;
     string tmp;
     int w,h;
+    const int bpp=12;
     getline(cin,s_filepath);
     const char* filepath=s_filepath.c_str();
     cout<<"请输入视频的宽："<<endl;
@@ -46,7 +47,7 @@ int main(){
     cout<<"请输入视频的高："<<endl;
     getline(cin,tmp);
     h=stoi(tmp);
-
+    unsigned char buffer[w*h*bpp/8];
     //SDL变量声明
 	SDL_Window *screen; 
 	SDL_Renderer* sdlRenderer;
@@ -82,12 +83,28 @@ int main(){
     //SDL-init done
 
 
-    bool isReplay=false;
-    bool isEnd=false;
+
     while(true){
         SDL_WaitEvent(&event);
         if(event.type==SFM_REFRESH_EVENT){
-            
+            if (fread(buffer, 1, w*h*bpp/8, fp) != w*h*bpp/8){
+				// Loop
+                SDL_Event event1;
+                SDL_WaitEvent(&event1);
+                if(event1.type==SDL_KEYDOWN){
+                    if(event1.key.keysym.sym==SDLK_F1){
+                        fseek(fp, 0, SEEK_SET);
+                        fread(buffer, 1, w*h*bpp/8, fp);
+                    }
+                }
+                else{
+                    continue;
+                }
+			}
+            SDL_UpdateTexture( sdlTexture, NULL, buffer, w);
+            SDL_RenderClear( sdlRenderer );   
+			SDL_RenderCopy( sdlRenderer, sdlTexture, NULL, &sdlRect);  
+			SDL_RenderPresent( sdlRenderer );  
         }
         else if(event.type==SDL_KEYDOWN){
             if(event.key.keysym.sym==SDLK_SPACE){
@@ -107,7 +124,7 @@ int main(){
         }
         if(restart_video){
             cout<<"restart"<<endl;
-            //重置到开头
+            fseek(fp, 0, SEEK_SET);
             cout<<"restart success"<<endl;
             restart_video=0;
         }

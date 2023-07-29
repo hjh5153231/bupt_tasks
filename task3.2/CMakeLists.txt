@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(task3.2)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+include_directories(${PROJECT_SOURCE_DIR}/openal/include)
+file(GLOB LIB ${PROJECT_SOURCE_DIR}/openal/lib/*.lib)
+link_directories(${PROJECT_SOURCE_DIR}/openal/lib)
+add_executable(main main.cpp)
+target_link_libraries(main ${LIB})
