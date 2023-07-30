@@ -1,19 +1,3 @@
 # ninja log v5
-7	1394	7123341619091172	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1395	1893	7123341624025243	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-2	1329	7123343367645787	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1329	1818	7123343372453901	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-3	1367	7123344395149462	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1367	1858	7123344400016432	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-3	1361	7123355992448991	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1361	1850	7123355997276081	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-3	1414	7123358802445250	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1415	1916	7123358807408058	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-3	1421	7123359840102461	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1421	1928	7123359845120892	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-4	1394	7123361762934592	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1394	1916	7123361768100777	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-3	1395	7123372392294815	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1395	1881	7123372397097609	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
-2	1546	7123381128847607	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1546	2023	7123381133566335	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4
+3	1604	7124023158422012	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
+1604	2113	7124023163468523	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	80c43c06c3e37be4

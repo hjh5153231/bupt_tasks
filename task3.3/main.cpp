@@ -17,28 +17,34 @@ extern "C"
 #include "libavutil/opt.h"
 };
 
-typedef struct _tFrame {
+typedef struct _AUTOFRAME {
 	void* data;
 	int size;
 	int samplerate;
 	double audio_clock;
 	int64_t audio_timestamp;
-}TFRAME, * PTFRAME;
+}AUTOFRAME, * PAUTOFRAME;
 //定义宏
-#define BUFFER_NUM 12
+#define BUFFER_NUM 3
 #define	SERVICE_UPDATE_PERIOD 20
 #define MAX_AUDIO_FRME_SIZE 192000
 #define SFM_REFRESH_EVENT  (SDL_USEREVENT + 1)
 #define SFM_BREAK_EVENT  (SDL_USEREVENT + 2)
 
 using namespace std;
+bool volumeChanged=false;
+float volume = 1.0;
 int thread_exit=0;
 int thread_pause=0;
 int restart_video=0;
-queue<PTFRAME> queueData; 
-int queueFront=0;
+queue<PAUTOFRAME> queueData; 
 ALuint source;
 double audio_clock = 0;
+double delay;
+int videoOffset=0;
+int fps;
+bool isReplay=false;
+bool isEnd=false;
 
 int refreshScreen(void *opaque){
     thread_exit=0;
@@ -49,7 +55,15 @@ int refreshScreen(void *opaque){
             event.type=SFM_REFRESH_EVENT;
             SDL_PushEvent(&event);
         }
-        SDL_Delay(40);
+		if(videoOffset==1){
+			SDL_Delay(950/fps);
+		}
+		else if(videoOffset==0){
+			SDL_Delay(1000/fps);
+		}
+		else{
+			SDL_Delay(50);
+		}
     }
     thread_exit=0;
     thread_pause=0;
@@ -131,14 +145,14 @@ int sdlRender(string s_filepath){
     sdlRect.h=h;
     SDL_Thread *video_tid;
     SDL_Event event;
+	fps=(int)av_q2d(fmtCtx->streams[videoStreamIndex]->avg_frame_rate)+1;
     video_tid=SDL_CreateThread(refreshScreen,NULL,NULL);
     //SDL-init done
 
     //packet to yuv
     pkt = av_packet_alloc();
     av_new_packet(pkt, w * h); 
-    bool isReplay=false;
-    bool isEnd=false;
+	double video_clock=0;
     while(true){
         SDL_WaitEvent(&event);
         if(event.type==SFM_REFRESH_EVENT){
@@ -161,14 +175,26 @@ int sdlRender(string s_filepath){
             if(isReplay){
                 av_seek_frame(fmtCtx, videoStreamIndex, 0, AVSEEK_FLAG_BACKWARD); // 将视频重置到开头
                 isReplay=false;
+				isEnd=false;
             }
             if(isEnd){
                 av_packet_unref(pkt);
-                isEnd=false;
                 continue;
             }
             if(avcodec_send_packet(codecCtx,pkt)==0){
                 while(avcodec_receive_frame(codecCtx,yuvFrame)==0){
+					video_clock=yuvFrame->pts*av_q2d(fmtCtx->streams[videoStreamIndex]->time_base);
+					delay=audio_clock-video_clock;
+					cout<<"音视频时间差值:"<<delay<<endl;
+					if(delay>0.03){
+						videoOffset=1;
+					}
+					else if(delay<-0.03){
+						videoOffset=-1;
+					}
+					else{
+						videoOffset=0;
+					}
                     SDL_UpdateYUVTexture(sdlTexture, &sdlRect,
                     yuvFrame->data[0], yuvFrame->linesize[0],
                     yuvFrame->data[1], yuvFrame->linesize[1],
@@ -189,6 +215,20 @@ int sdlRender(string s_filepath){
                 restart_video=1;
                 cout<<"out f1"<<endl;
             }
+			else if(event.key.keysym.sym==SDLK_UP){
+				volumeChanged=true;
+				volume += 0.1f;
+				if (volume > 1.0f) {
+                    volume = 1.0f;
+                }
+			}
+			else if(event.key.keysym.sym==SDLK_DOWN){
+				volumeChanged=true;
+				volume -= 0.1f;
+				if (volume < 0.0f) {
+                    volume = 0.0f;
+                }
+			}
         }
         else if(event.type==SDL_QUIT){
             thread_exit=1;
@@ -235,7 +275,7 @@ void setopenal(ALuint source)
 
 int SoundCallback(ALuint & bufferID) {
 	if (queueData.empty()) return -1;
-	PTFRAME frame = queueData.front();
+	PAUTOFRAME frame = queueData.front();
 	queueData.pop();
 	if (frame == nullptr)
 		return -1;
@@ -318,17 +358,17 @@ int main()
 		cout << "Couldn't open decoder" << endl;
 		return -1;
 	}
-	AVPacket* packet = (AVPacket*)av_malloc(sizeof(AVPacket));//压缩数	
-	AVFrame* frame = av_frame_alloc();//解压缩数据
+	AVPacket* packet = (AVPacket*)av_malloc(sizeof(AVPacket));//解码前数据
+	AVFrame* frame = av_frame_alloc();//解码后音频帧
 	SwrContext* swr = swr_alloc();//重采样
 	//重采样参数设置
 	int out_nb_samples = 1024;
 	enum AVSampleFormat in_sample_fmt = codecCtx->sample_fmt;//输入采样格式
 	enum AVSampleFormat out_sample_fmt = AV_SAMPLE_FMT_S16;	//输出采样格式
 	int in_sample_rate = codecCtx->sample_rate;//输入采样率
-	int out_sample_rate = in_sample_rate;	//输出采样率
+	int out_sample_rate = 44100;	//输出采样率
 	uint64_t in_ch_layout = codecCtx->channel_layout;	//输入声道布局
-	uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;	
+	uint64_t out_ch_layout = in_ch_layout;	
 	int out_channels = av_get_channel_layout_nb_channels(out_ch_layout);//根据通道布局类型获取通道数
 	int nb_out_channel = av_get_channel_layout_nb_channels(out_ch_layout);//输出声道个数
 	int out_buffer_size = av_samples_get_buffer_size(NULL, out_channels, out_nb_samples, out_sample_fmt, 1);
@@ -384,14 +424,14 @@ int main()
 					swr_convert(swr, &out_buffer_audio, MAX_AUDIO_FRME_SIZE, (const uint8_t * *)frame->data, frame->nb_samples);
 
 					out_buffer_size = av_samples_get_buffer_size(NULL, out_channels, frame->nb_samples, out_sample_fmt, 1);
-					PTFRAME ptframe = new TFRAME;
-					ptframe->data = out_buffer_audio;
-					ptframe->size = out_buffer_size;
-					ptframe->samplerate = out_sample_rate;
+					PAUTOFRAME pAUTOFRAME = new AUTOFRAME;
+					pAUTOFRAME->data = out_buffer_audio;
+					pAUTOFRAME->size = out_buffer_size;
+					pAUTOFRAME->samplerate = out_sample_rate;
 					audio_clock = av_q2d(codecCtx->time_base) * frame->pts;
-					ptframe->audio_clock = audio_clock;
+					pAUTOFRAME->audio_clock = audio_clock;
 
-					queueData.push(ptframe);  //解码后数据存入队列
+					queueData.push(pAUTOFRAME);  //解码后数据存入队列
 				}
 			}
 		}
@@ -421,7 +461,18 @@ int main()
 			processed--;
 		}
 		alGetSourcei(source, AL_SOURCE_STATE, &state);
-		if (state != AL_PLAYING){
+
+		if(volumeChanged){
+			volumeChanged=false;
+			alSourcef(source, AL_GAIN, volume);
+		}
+		if(thread_pause){
+			alSourcePause(source);
+		}
+		else if(isEnd){
+			alSourcePause(source);
+		}
+		else if (state != AL_PLAYING){
 			alGetSourcei(source, AL_BUFFERS_QUEUED, &iQueuedBuffers);
 			if (iQueuedBuffers) {
 				alSourcePlay(source);
@@ -430,6 +481,13 @@ int main()
 				break;
 			}
 		}
+		if (thread_exit) {
+			 alSourceStop(source);
+			 alSourcei(source, AL_BUFFER, 0);
+			 alDeleteBuffers(BUFFER_NUM, m_buffers);
+			 alDeleteSources(1, &source);
+			 break;
+		 }
 	}
 	alSourceStop(source);
 	alSourcei(source, AL_BUFFER, 0);
