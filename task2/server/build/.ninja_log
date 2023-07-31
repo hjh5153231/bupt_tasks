@@ -1,0 +1,15 @@
+# ninja log v5
+2	1285	7125034305632283	CMakeFiles/server.dir/Server.cpp.obj	9ebd3c2320ffd80b
+2	461	7125034369286248	server.exe	20aefb35ceb1cc0f
+3	1319	7125059206176781	CMakeFiles/server.dir/Server.cpp.obj	9ebd3c2320ffd80b
+1319	1835	7125059211282591	server.exe	20aefb35ceb1cc0f
+2	1186	7125060416611867	CMakeFiles/server.dir/Server.cpp.obj	9ebd3c2320ffd80b
+1186	1643	7125060421119813	server.exe	20aefb35ceb1cc0f
+3	1228	7125062165632739	CMakeFiles/server.dir/Server.cpp.obj	9ebd3c2320ffd80b
+1228	1675	7125062170055359	server.exe	20aefb35ceb1cc0f
+3	1341	7125065255583635	CMakeFiles/server.dir/Server.cpp.obj	9ebd3c2320ffd80b
+2	464	7125065448212162	server.exe	20aefb35ceb1cc0f
+2	1231	7125075148542843	CMakeFiles/server.dir/Server.cpp.obj	9ebd3c2320ffd80b
+1232	1708	7125075153259951	server.exe	20aefb35ceb1cc0f
+2	1227	7125084448511691	CMakeFiles/server.dir/Server.cpp.obj	9ebd3c2320ffd80b
+1228	1680	7125084452985453	server.exe	20aefb35ceb1cc0f

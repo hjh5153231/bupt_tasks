@@ -26,28 +26,28 @@ extern "C"
 #define SFM_REFRESH_EVENT  (SDL_USEREVENT + 1)
 #define SFM_BREAK_EVENT  (SDL_USEREVENT + 2)
 #define SFM_REPLAY_EVENT  (SDL_USEREVENT + 3)
+//音频缓冲区大小
 #define NUMBUFFERS (3)
 
 
 using namespace std;
+//全局变量
 int thread_exit = 0;
 int thread_pause = 0;
 bool isEnd=false;
-bool volumeChanged=false;
-float volume = 1.0f;
-int restart_video=0;
-int audioSeek=0;
+bool volumeChanged=false;//音量是否改变
+float volume = 1.0f;//音量大小
+int restart_video=0;//重置信号量
+int audioSeek=0;//标记音频快进或快退
 ALuint source;
-double audio_clock = 0;
-ALuint buffers[NUMBUFFERS];
-ALuint ProcessedBufferID = 0;
-ALint processed=0;
-//ffmpeg对于封装文件进行解码
+double audio_clock = 0;//音频时钟
+ALuint buffers[NUMBUFFERS];//音频缓冲区
+//ffmpeg变量定义
 AVFormatContext* fmtCtx=NULL;
 AVCodecParameters* avCodecPara=NULL;
 AVCodecContext* codecCtx = NULL;
 AVCodec* codec = NULL;
-int audioindex = -1;
+int audioindex = -1;//音频流index
 AVFrame* frame = av_frame_alloc();//解压缩数据
 SwrContext* swr = swr_alloc();//重采样
 //openAL
@@ -55,7 +55,7 @@ ALCdevice *device = NULL;
 ALCcontext *context = NULL;
 
 
-int readPCMFrame(ALuint & bufferID){
+int readPCMFrame(ALuint & bufferID){//读取音频帧到指定的buffer
 	AVPacket* packet = (AVPacket*)av_malloc(sizeof(AVPacket));//压缩数	
 	//重采样参数设置
 	int out_nb_samples = 1024;
@@ -96,12 +96,12 @@ int readPCMFrame(ALuint & bufferID){
 				if (ret >= 0) {
 					out_buffer_audio = (uint8_t*)av_malloc(MAX_AUDIO_FRME_SIZE * 2);//*2是保证输出缓存大于输入数据大小
 					//重采样
-					swr_convert(swr, &out_buffer_audio, MAX_AUDIO_FRME_SIZE, (const uint8_t * *)frame->data, frame->nb_samples);
+					swr_convert(swr, &out_buffer_audio, MAX_AUDIO_FRME_SIZE, (const uint8_t * *)frame->data, frame->nb_samples);//frame中的data重采样后存储到out_buffer_audio
 
-					out_buffer_size = av_samples_get_buffer_size(NULL, out_channels, frame->nb_samples, out_sample_fmt, 1);
-					audio_clock = av_q2d(codecCtx->time_base) * frame->pts;
-					alBufferData(bufferID,AL_FORMAT_STEREO16, out_buffer_audio, out_buffer_size, out_sample_rate);
-					alSourceQueueBuffers(source,1,&bufferID);
+					out_buffer_size = av_samples_get_buffer_size(NULL, out_channels, frame->nb_samples, out_sample_fmt, 1);//获取该音频帧的size
+					audio_clock = av_q2d(codecCtx->time_base) * frame->pts;//更新音频时钟
+					alBufferData(bufferID,AL_FORMAT_STEREO16, out_buffer_audio, out_buffer_size, out_sample_rate);//压入缓存
+					alSourceQueueBuffers(source,1,&bufferID);//加入播放队列
 				}
 			}
 			av_packet_unref(packet);
@@ -112,7 +112,7 @@ int readPCMFrame(ALuint & bufferID){
 }
 
 //初始化openal
-void setopenal(ALuint source)
+void openAlInit(ALuint source)
 {
 	ALfloat SourceP[] = { 0.0, 0.0, 0.0 };
 	ALfloat SourceV[] = { 0.0, 0.0, 0.0 };
@@ -189,7 +189,7 @@ int main()
 		return -1;
 	}
 
-
+	//openal init
 	device = alcOpenDevice(NULL);
     if (!device){
         fprintf(stderr,"fail to open device\n");
@@ -206,41 +206,44 @@ int main()
     }
 	
     alGenSources(1, &source);
-	setopenal(source);//初始化
+	openAlInit(source);//初始化
 	alGenBuffers(NUMBUFFERS, buffers); //创建缓冲区
 
-	ALint processed;
-	ALint  state;
-	ALint iQueuedBuffers;
+	ALint processed;//已处理的缓冲数
+	ALint  state;//播放器的状态
+	ALint iQueuedBuffers;//当前播放队列中的缓冲数
 
+	//加入视频播放线程，传递全局参数
 	thread sdlplay(sdlRender,s_filepath,std::ref(audio_clock),std::ref(thread_exit),std::ref(thread_pause),std::ref(volumeChanged),std::ref(volume),std::ref(isEnd),std::ref(restart_video),std::ref(audioSeek));
 	sdlplay.detach();
 
+
+	//播放开始前填充缓冲区
 	for (int i = 0; i < NUMBUFFERS; i++) {
 		readPCMFrame(buffers[i]);
 	}
 	audio_clock=0;
-	alSourcePlay(source);
+	alSourcePlay(source);//开始播放
 
 	while(true){
-		if (thread_exit) {
+		if (thread_exit) {//线程退出，释放资源
 			alSourceStop(source);
 			alSourcei(source, AL_BUFFER, 0);
 			alDeleteBuffers(NUMBUFFERS, buffers);
 			alDeleteSources(1, &source);
 			break;
 		}
-		if(restart_video==2){
+		if(restart_video==2){//当重置信号量为2，重置音频到开头，然后再重置视频
 			cout<<"restart="<<restart_video<<endl;
 			av_seek_frame(fmtCtx, audioindex, 0, AVSEEK_FLAG_BACKWARD);
 			alSourcePlay(source);
 			alGetSourcei(source, AL_SOURCE_STATE, &state);
 			restart_video--;
 		}
-		if(audioSeek==0){
+		if(audioSeek==0){//正常播放
 			
 		}
-		else if(audioSeek==1){
+		else if(audioSeek==1){//快进30秒
 			av_seek_frame(fmtCtx, audioindex, (audio_clock+30.0)/av_q2d(fmtCtx->streams[audioindex]->time_base), AVSEEK_FLAG_BACKWARD);
 			avcodec_flush_buffers(codecCtx);
 			if(state!=AL_PLAYING){
@@ -248,7 +251,7 @@ int main()
 			}
 			audioSeek=0;
 		}
-		else if(audioSeek==-1){
+		else if(audioSeek==-1){//快退30秒
 			av_seek_frame(fmtCtx, audioindex, (audio_clock-30.0)/av_q2d(fmtCtx->streams[audioindex]->time_base), AVSEEK_FLAG_BACKWARD);
 			avcodec_flush_buffers(codecCtx);
 			if(state!=AL_PLAYING){
@@ -258,6 +261,7 @@ int main()
 		}
 		processed = 0;
 		alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
+		//当存在缓冲区被处理完毕，填充新的音频帧到缓冲区
 		while (processed > 0) {
 			ALuint bufferID = 0;
 			alSourceUnqueueBuffers(source, 1, &bufferID);
@@ -265,22 +269,22 @@ int main()
 			processed--;
 		}
 		alGetSourcei(source, AL_SOURCE_STATE, &state);
-		if(volumeChanged){
+		if(volumeChanged){//音量改变
 			volumeChanged=false;
 			alSourcef(source, AL_GAIN, volume);
 		}
-		if(thread_pause){
+		if(thread_pause){//暂停
 			if(state==AL_PLAYING){
 				alSourcePause(source);
 			}
 		}
-		else if (state != AL_PLAYING){
+		else if (state != AL_PLAYING){//播放器不在播放
 			alGetSourcei(source, AL_BUFFERS_QUEUED, &iQueuedBuffers);
-			if (iQueuedBuffers) {
+			if (iQueuedBuffers) {//播放队列中还有数据就继续播放
 				alSourcePlay(source);
 			}
 			else {
-				if(restart_video==2){
+				if(restart_video==2){//假如需要重置音频，那么就重置后重新播放
 					av_seek_frame(fmtCtx, audioindex, 0, AVSEEK_FLAG_BACKWARD);
 					for (int i = 0; i < NUMBUFFERS; i++) {
 						readPCMFrame(buffers[i]);

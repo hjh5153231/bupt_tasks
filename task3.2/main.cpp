@@ -7,6 +7,7 @@
 using namespace std;
 int main(){
     system("chcp 65001");
+    //openAl播放初始化
     ALCdevice *device = NULL;
     ALCcontext *context = NULL;
     device = alcOpenDevice(NULL);
@@ -39,6 +40,7 @@ int main(){
     ALfloat position[] = {0.0f,0.0f,0.0f};
     //播放的速度
     ALfloat velocity[] = {0.0f,0.0f,0.0f};
+    //分配Buffer和source
     alGenBuffers(1,&buffer);
     alGenSources(1,&source);
     cout<<"请输入播放的pcm文件url"<<endl;
@@ -46,13 +48,16 @@ int main(){
     getline(cin,s_filepath);
     const char* filepath=s_filepath.c_str();
     FILE *f = fopen(filepath,"rb");
+    //指针移动到末尾，和ftell结合获取文件大小
     fseek(f,0,SEEK_END);
     long length  = ftell(f);
-    rewind(f);
+
+    rewind(f);//重新定位到开头
+    //分配data存储音频数据
     char* data = (char*)malloc(length);
-    fread(data,sizeof(char),length,f);
+    fread(data,sizeof(char),length,f);//从文件中读取数据到data
     fclose(f);
-    alBufferData(buffer,audioFormat,data,length,sample_rate);
+    alBufferData(buffer,audioFormat,data,length,sample_rate);//将data压入openal缓冲区
     if (alGetError() != AL_NO_ERROR) {
         return -1;
     }

@@ -122,7 +122,7 @@ int Calculator::getPrecedence(char op) {//获取符号优先级
     return 0;
 }
 
-double Calculator::calOp(double a, double b, char op) {//计算某个
+double Calculator::calOp(double a, double b, char op) {//计算某个运算符两侧数的值
     if(b==0 && op=='/'){
         exception e;
         throw e;

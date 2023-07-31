@@ -15,15 +15,16 @@ extern "C"
 #include "libavutil/avutil.h"
 #include "libavutil/opt.h"
 };
+//定义SDL自定义事件
 #define SFM_REFRESH_EVENT  (SDL_USEREVENT + 1)
 #define SFM_BREAK_EVENT  (SDL_USEREVENT + 2)
 #define SFM_REPLAY_EVENT  (SDL_USEREVENT + 3)
-
+//视频线程函数的全局变量
 bool isReplay=false;
-int fps;
-int videoOffset;
+int fps;//帧率
+int videoOffset;//标记是否需要调整视频进度来进行同步
 
-int refreshScreen(int &thread_exit,int &thread_pause){
+int refreshScreen(int &thread_exit,int &thread_pause){//
     thread_exit=0;
     thread_pause=0;
     while(!thread_exit){
@@ -32,14 +33,14 @@ int refreshScreen(int &thread_exit,int &thread_pause){
             event.type=SFM_REFRESH_EVENT;
             SDL_PushEvent(&event);
         }
-		if(videoOffset==1){
+		if(videoOffset==1){//快进
 			SDL_Delay(600/fps);
 		}
-		else if(videoOffset==0){
+		else if(videoOffset==0){//正常
 			SDL_Delay(1000/fps);
 		}
 		else{
-			SDL_Delay(1200/fps);
+			SDL_Delay(1200/fps);//慢放
 		}
     }
     thread_exit=0;
@@ -51,6 +52,7 @@ int refreshScreen(int &thread_exit,int &thread_pause){
 }
 int sdlRender(string s_filepath,double &audio_clock,int &thread_exit,int &thread_pause,bool &volumeChanged,float &volume,bool &isEnd,int &restart_video,int &audioSeek){
 	const char* filepath=s_filepath.c_str();
+    //ffmpeg变量定义
 	AVFormatContext* fmtCtx=NULL;
     AVCodecParameters* avCodecPara=NULL;
     AVCodecContext* codecCtx = NULL;
@@ -58,6 +60,7 @@ int sdlRender(string s_filepath,double &audio_clock,int &thread_exit,int &thread
     AVPacket* pkt = NULL;
     AVFrame* yuvFrame = av_frame_alloc();
     int ret=0;//保存函数返回的tag值
+    //视频音频流index
     int videoStreamIndex=-1;
     int audioStreamIndex=-1;
     double delay;
@@ -67,7 +70,7 @@ int sdlRender(string s_filepath,double &audio_clock,int &thread_exit,int &thread
 	SDL_Renderer* sdlRenderer;
 	SDL_Texture* sdlTexture;
 	SDL_Rect sdlRect;
-
+    //分配ffmpeg变量，初始化
     fmtCtx=avformat_alloc_context();
     if((ret=avformat_open_input(&fmtCtx,filepath,NULL,NULL))!=0){
         cout<<"打开视频文件失败,error code:"<<ret<<endl;
@@ -113,46 +116,49 @@ int sdlRender(string s_filepath,double &audio_clock,int &thread_exit,int &thread
         cout<<"SDL创建窗口失败"<<endl;
         return -1;
     }
+    //使窗口在最前方
     HWND hwnd = GetActiveWindow();
     SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+    //SDL变量初始化
     sdlRenderer=SDL_CreateRenderer(screen,-1,0);
     sdlTexture=SDL_CreateTexture(sdlRenderer,SDL_PIXELFORMAT_IYUV,SDL_TEXTUREACCESS_STREAMING,w,h);
     sdlRect.x=0;
     sdlRect.y=0;
     sdlRect.w=w;
     sdlRect.h=h;
+    //利用SDL事件机制控制视频刷新
     SDL_Thread *video_tid;
     SDL_Event event;
 	fps=(int)av_q2d(fmtCtx->streams[videoStreamIndex]->avg_frame_rate)+1;
-    std::thread refreshThread(refreshScreen,ref(thread_exit), ref(thread_pause));
-    refreshThread.detach();
+    std::thread refreshThread(refreshScreen,ref(thread_exit), ref(thread_pause));//创建线程，参数为全局变量的引用
+    refreshThread.detach();//线程后台运行
     //SDL-init done
 
 
     int init=0;
     //packet to yuv
     pkt = av_packet_alloc();
-    av_new_packet(pkt, w * h); 
-	double video_clock=0;
+    av_new_packet(pkt, w * h); //分配packet
+	double video_clock=0;//存储当前视频播放时刻
     while(true){
         SDL_WaitEvent(&event);
         if(event.type==SFM_REFRESH_EVENT){
-            while(true){
+            while(true){//在视频没结束的情况下提取下一个packet
                 if(av_read_frame(fmtCtx, pkt)<0){
                     SDL_Event event1;
                     SDL_WaitEvent(&event1);
                     if(event1.type==SDL_KEYDOWN){
                         if(event1.key.keysym.sym==SDLK_F1){
                             av_seek_frame(fmtCtx, videoStreamIndex, 0, AVSEEK_FLAG_BACKWARD);
-                            restart_video=2;
+                            restart_video=2;//设定restart_video为2来使视频和音频一起重置，不会造成线程引用冲突
                             av_packet_unref(pkt);
                             continue;
                         }
-                        else{
+                        else{//别的事件不管
                             continue;
                         }
                     }
-                    else{
+                    else{//别的事件不管
                         continue;
                     }
                 }
@@ -160,19 +166,19 @@ int sdlRender(string s_filepath,double &audio_clock,int &thread_exit,int &thread
                     break;
                 }
             }
-            if(avcodec_send_packet(codecCtx,pkt)==0){
+            if(avcodec_send_packet(codecCtx,pkt)==0){//解码，读取下一帧yuv
                 while(avcodec_receive_frame(codecCtx,yuvFrame)==0){
-					video_clock=yuvFrame->pts*av_q2d(fmtCtx->streams[videoStreamIndex]->time_base);
-					delay=audio_clock-video_clock;
+					video_clock=yuvFrame->pts*av_q2d(fmtCtx->streams[videoStreamIndex]->time_base);//播放前更新视频时钟
+					delay=audio_clock-video_clock;//控制差值在一定范围内，音视频动态同步
 					cout<<"音视频时间差值:"<<delay<<endl;
                     if(init=0 && delay>0.03){
-                        av_seek_frame(fmtCtx, videoStreamIndex, (audio_clock+delay)/av_q2d(fmtCtx->streams[videoStreamIndex]->time_base), AVSEEK_FLAG_BACKWARD);
+                        av_seek_frame(fmtCtx, videoStreamIndex, (audio_clock+delay)/av_q2d(fmtCtx->streams[videoStreamIndex]->time_base), AVSEEK_FLAG_BACKWARD);//初始调整
                         init++;
                     }
 					if(delay>0.03){
 						videoOffset=1;
 					}
-					else if(delay<0){
+					else if(delay<0){//由于音频的时钟受缓存大小影响，因此不设定为-0.03
 						videoOffset=-1;
 					}
 					else{
@@ -190,34 +196,34 @@ int sdlRender(string s_filepath,double &audio_clock,int &thread_exit,int &thread
             av_packet_unref(pkt);
         }
         else if(event.type==SDL_KEYDOWN){
-            if(event.key.keysym.sym==SDLK_SPACE){
+            if(event.key.keysym.sym==SDLK_SPACE){//空格控制暂停
                 thread_pause=!thread_pause;
                 cout<<"out space"<<endl;
             }
-            else if(event.key.keysym.sym==SDLK_F1){
+            else if(event.key.keysym.sym==SDLK_F1){//F1控制重放
                 restart_video=2;
                 cout<<"out f1"<<endl;
             }
-			else if(event.key.keysym.sym==SDLK_UP){
+			else if(event.key.keysym.sym==SDLK_UP){//控制音量上升
 				volumeChanged=true;
 				volume += 0.1f;
 				if (volume > 1.0f) {
                     volume = 1.0f;
                 }
 			}
-			else if(event.key.keysym.sym==SDLK_DOWN){
+			else if(event.key.keysym.sym==SDLK_DOWN){//音量下降
 				volumeChanged=true;
 				volume -= 0.1f;
 				if (volume < 0.0f) {
                     volume = 0.0f;
                 }
 			}
-            else if(event.key.keysym.sym==SDLK_LEFT){
-                av_seek_frame(fmtCtx, videoStreamIndex, (audio_clock-30.0+delay*(double)fps)/av_q2d(fmtCtx->streams[videoStreamIndex]->time_base), AVSEEK_FLAG_BACKWARD);
+            else if(event.key.keysym.sym==SDLK_LEFT){//快退30秒
+                av_seek_frame(fmtCtx, videoStreamIndex, (audio_clock-30.0+delay*(double)fps)/av_q2d(fmtCtx->streams[videoStreamIndex]->time_base), AVSEEK_FLAG_BACKWARD);//通过时钟计算对应时间戳
                 avcodec_flush_buffers(codecCtx);
                 audioSeek=-1;
             }
-            else if(event.key.keysym.sym==SDLK_RIGHT){
+            else if(event.key.keysym.sym==SDLK_RIGHT){//快进30秒
                 av_seek_frame(fmtCtx, videoStreamIndex, (audio_clock+30.0+delay*(double)fps)/av_q2d(fmtCtx->streams[videoStreamIndex]->time_base), AVSEEK_FLAG_BACKWARD);
                 avcodec_flush_buffers(codecCtx);
                 audioSeek=1;
@@ -229,13 +235,14 @@ int sdlRender(string s_filepath,double &audio_clock,int &thread_exit,int &thread
         else if(event.type==SFM_BREAK_EVENT){
             break;
         }
-        if(restart_video==1){
+        if(restart_video==1){//等音乐重置完，再重置视频
             cout<<"restart"<<endl;
             av_seek_frame(fmtCtx, videoStreamIndex, 0, AVSEEK_FLAG_BACKWARD); // 将视频重置到开头
             cout<<"restart success"<<endl;
             restart_video--;
         }
     }
+    //释放资源
     SDL_Quit();
     av_packet_free(&pkt);
     avcodec_close(codecCtx);

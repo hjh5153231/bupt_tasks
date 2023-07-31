@@ -13,8 +13,8 @@ int main(){
             break;
         }
         try {
-            input=calculator.preprocessExpression(input);
-            double result = calculator.evaluateExpression(input);
+            input=calculator.preprocessExpression(input); //算式预处理，(针对负号的情况)
+            double result = calculator.evaluateExpression(input);//计算结果
             cout << "结果：" << result << endl;
         } catch (...) {
             cout << "表达式错误，请重新输入：" << endl;

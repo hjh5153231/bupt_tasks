@@ -1,0 +1,8 @@
+[
+{
+  "directory": "F:/gitclone/bupt_tasks/task2/client/build",
+  "command": "D:\\compilers\\tdm-gcc\\bin\\g++.exe -g -o CMakeFiles\\client.dir\\Client.cpp.obj -c F:\\gitclone\\bupt_tasks\\task2\\client\\Client.cpp",
+  "file": "F:\\gitclone\\bupt_tasks\\task2\\client\\Client.cpp",
+  "output": "CMakeFiles\\client.dir\\Client.cpp.obj"
+}
+]
