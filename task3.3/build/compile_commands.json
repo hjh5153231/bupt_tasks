@@ -4,5 +4,11 @@
   "command": "D:\\compilers\\tdm-gcc\\bin\\g++.exe -IF:/gitclone/bupt_tasks/task3.3/include -IF:/gitclone/bupt_tasks/task3.3/ffmpeg/include -IF:/gitclone/bupt_tasks/task3.3/sdl/include -IF:/gitclone/bupt_tasks/task3.3/openal/include -g -o CMakeFiles\\main.dir\\main.cpp.obj -c F:\\gitclone\\bupt_tasks\\task3.3\\main.cpp",
   "file": "F:\\gitclone\\bupt_tasks\\task3.3\\main.cpp",
   "output": "CMakeFiles\\main.dir\\main.cpp.obj"
+},
+{
+  "directory": "F:/gitclone/bupt_tasks/task3.3/build",
+  "command": "D:\\compilers\\tdm-gcc\\bin\\g++.exe -IF:/gitclone/bupt_tasks/task3.3/include -IF:/gitclone/bupt_tasks/task3.3/ffmpeg/include -IF:/gitclone/bupt_tasks/task3.3/sdl/include -IF:/gitclone/bupt_tasks/task3.3/openal/include -g -o CMakeFiles\\main.dir\\src\\VideoThread.cpp.obj -c F:\\gitclone\\bupt_tasks\\task3.3\\src\\VideoThread.cpp",
+  "file": "F:\\gitclone\\bupt_tasks\\task3.3\\src\\VideoThread.cpp",
+  "output": "CMakeFiles\\main.dir\\src\\VideoThread.cpp.obj"
 }
 ]
