@@ -42,12 +42,16 @@ int audioSeek=0;//标记音频快进或快退
 ALuint source;
 double audio_clock = 0;//音频时钟
 ALuint buffers[NUMBUFFERS];//音频缓冲区
+
+// ALuint ProcessedBufferID = 0;
+// ALint processed=0;
+
 //ffmpeg变量定义
 AVFormatContext* fmtCtx=NULL;
 AVCodecParameters* avCodecPara=NULL;
 AVCodecContext* codecCtx = NULL;
 AVCodec* codec = NULL;
-int audioindex = -1;//音频流index
+int audioindex = -1;
 AVFrame* frame = av_frame_alloc();//解压缩数据
 SwrContext* swr = swr_alloc();//重采样
 //openAL
@@ -55,7 +59,7 @@ ALCdevice *device = NULL;
 ALCcontext *context = NULL;
 
 
-int readPCMFrame(ALuint & bufferID){//读取音频帧到指定的buffer
+int readPCMFrame(ALuint & bufferID){
 	AVPacket* packet = (AVPacket*)av_malloc(sizeof(AVPacket));//压缩数	
 	//重采样参数设置
 	int out_nb_samples = 1024;
@@ -111,8 +115,62 @@ int readPCMFrame(ALuint & bufferID){//读取音频帧到指定的buffer
 	return 0;
 }
 
+int readPCMFrame(){//读取一帧，但不进入缓存和播放队列
+	AVPacket* packet = (AVPacket*)av_malloc(sizeof(AVPacket));//压缩数	
+	//重采样参数设置
+	int out_nb_samples = 1024;
+	enum AVSampleFormat in_sample_fmt = codecCtx->sample_fmt;//输入采样格式
+	enum AVSampleFormat out_sample_fmt = AV_SAMPLE_FMT_S16;	//输出采样格式
+	int in_sample_rate = codecCtx->sample_rate;//输入采样率
+	int out_sample_rate = 44100;	//输出采样率
+	uint64_t in_ch_layout = codecCtx->channel_layout;	//输入声道布局
+	uint64_t out_ch_layout = AV_CH_LAYOUT_STEREO;	
+	int out_channels = av_get_channel_layout_nb_channels(out_ch_layout);//根据通道布局类型获取通道数
+	int nb_out_channel = av_get_channel_layout_nb_channels(out_ch_layout);//输出声道个数
+	int out_buffer_size = av_samples_get_buffer_size(NULL, out_channels, out_nb_samples, out_sample_fmt, 1);
+	uint8_t* out_buffer_audio;
+
+	codecCtx->channel_layout=av_get_default_channel_layout(codecCtx->channels);
+	//swr
+	swr_alloc_set_opts(swr, out_ch_layout, out_sample_fmt, out_sample_rate, in_ch_layout, in_sample_fmt, in_sample_rate, 0, NULL);
+	swr_init(swr);
+
+	int ret;
+	ALint  state;
+	while (av_read_frame(fmtCtx, packet) >= 0) {//读取下一帧数据
+		if (packet->stream_index == audioindex) {
+			ret = avcodec_send_packet(codecCtx, packet);
+			if (ret < 0) {
+				cout << "avcodec_send_packet：" << ret << endl;
+				continue;
+			}
+			while (ret >= 0) {
+				ret = avcodec_receive_frame(codecCtx, frame);
+				if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) {
+					return -1;
+				}
+				else if (ret < 0) {
+					cout << "avcodec_receive_frame：" << AVERROR(ret) << endl;
+					return -1;
+				}
+				if (ret >= 0) {
+					out_buffer_audio = (uint8_t*)av_malloc(MAX_AUDIO_FRME_SIZE * 2);//*2是保证输出缓存大于输入数据大小
+					//重采样
+					swr_convert(swr, &out_buffer_audio, MAX_AUDIO_FRME_SIZE, (const uint8_t * *)frame->data, frame->nb_samples);
+
+					out_buffer_size = av_samples_get_buffer_size(NULL, out_channels, frame->nb_samples, out_sample_fmt, 1);
+					audio_clock = av_q2d(codecCtx->time_base) * frame->pts;
+				}
+			}
+			av_packet_unref(packet);
+			break;
+		}
+	}
+	return 0;
+}
+
 //初始化openal
-void openAlInit(ALuint source)
+void initopenal(ALuint source)
 {
 	ALfloat SourceP[] = { 0.0, 0.0, 0.0 };
 	ALfloat SourceV[] = { 0.0, 0.0, 0.0 };
@@ -189,7 +247,7 @@ int main()
 		return -1;
 	}
 
-	//openal init
+
 	device = alcOpenDevice(NULL);
     if (!device){
         fprintf(stderr,"fail to open device\n");
@@ -206,7 +264,7 @@ int main()
     }
 	
     alGenSources(1, &source);
-	openAlInit(source);//初始化
+	initopenal(source);//初始化
 	alGenBuffers(NUMBUFFERS, buffers); //创建缓冲区
 
 	ALint processed;//已处理的缓冲数
@@ -216,7 +274,6 @@ int main()
 	//加入视频播放线程，传递全局参数
 	thread sdlplay(sdlRender,s_filepath,std::ref(audio_clock),std::ref(thread_exit),std::ref(thread_pause),std::ref(volumeChanged),std::ref(volume),std::ref(isEnd),std::ref(restart_video),std::ref(audioSeek));
 	sdlplay.detach();
-
 
 	//播放开始前填充缓冲区
 	for (int i = 0; i < NUMBUFFERS; i++) {
@@ -249,6 +306,7 @@ int main()
 			if(state!=AL_PLAYING){
 				alSourcePlay(source);
 			}
+			readPCMFrame();
 			audioSeek=0;
 		}
 		else if(audioSeek==-1){//快退30秒
@@ -257,6 +315,7 @@ int main()
 			if(state!=AL_PLAYING){
 				alSourcePlay(source);
 			}
+			readPCMFrame();
 			audioSeek=0;
 		}
 		processed = 0;

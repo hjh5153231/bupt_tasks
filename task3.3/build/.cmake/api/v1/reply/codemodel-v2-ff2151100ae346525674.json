@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "main::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-main-Debug-c350ff47ad854cda2b05.json",
+					"jsonFile" : "target-main-Debug-7511b946564b8c76d4da.json",
 					"name" : "main",
 					"projectIndex" : 0
 				}
@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "F:/gitclone/bupt_tasks/task3.3/build",
-		"source" : "F:/gitclone/bupt_tasks/task3.3"
+		"build" : "F:/gitclone/bupt_tasks_new/task3.3/build",
+		"source" : "F:/gitclone/bupt_tasks_new/task3.3"
 	},
 	"version" : 
 	{

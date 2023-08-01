@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "F:/gitclone/bupt_tasks/task3.3/bin/main.exe"
+			"path" : "F:/gitclone/bupt_tasks_new/task3.3/bin/main.exe"
 		},
 		{
-			"path" : "F:/gitclone/bupt_tasks/task3.3/bin/main.pdb"
+			"path" : "F:/gitclone/bupt_tasks_new/task3.3/bin/main.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -96,19 +96,19 @@
 			[
 				{
 					"backtrace" : 6,
-					"path" : "F:/gitclone/bupt_tasks/task3.3/include"
+					"path" : "F:/gitclone/bupt_tasks_new/task3.3/include"
 				},
 				{
 					"backtrace" : 7,
-					"path" : "F:/gitclone/bupt_tasks/task3.3/ffmpeg/include"
+					"path" : "F:/gitclone/bupt_tasks_new/task3.3/ffmpeg/include"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "F:/gitclone/bupt_tasks/task3.3/sdl/include"
+					"path" : "F:/gitclone/bupt_tasks_new/task3.3/sdl/include"
 				},
 				{
 					"backtrace" : 9,
-					"path" : "F:/gitclone/bupt_tasks/task3.3/openal/include"
+					"path" : "F:/gitclone/bupt_tasks_new/task3.3/openal/include"
 				}
 			],
 			"language" : "CXX",
@@ -134,62 +134,62 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "-LF:\\gitclone\\bupt_tasks\\task3.3\\openal\\lib",
+				"fragment" : "-LF:\\gitclone\\bupt_tasks_new\\task3.3\\openal\\lib",
 				"role" : "libraryPath"
 			},
 			{
 				"backtrace" : 3,
-				"fragment" : "-LF:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib",
+				"fragment" : "-LF:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib",
 				"role" : "libraryPath"
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "-LF:\\gitclone\\bupt_tasks\\task3.3\\sdl\\lib",
+				"fragment" : "-LF:\\gitclone\\bupt_tasks_new\\task3.3\\sdl\\lib",
 				"role" : "libraryPath"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib\\avcodec.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib\\avcodec.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib\\avdevice.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib\\avdevice.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib\\avfilter.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib\\avfilter.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib\\avformat.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib\\avformat.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib\\avutil.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib\\avutil.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib\\swresample.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib\\swresample.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\ffmpeg\\lib\\swscale.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\ffmpeg\\lib\\swscale.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\openal\\lib\\EFX-Util.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\openal\\lib\\EFX-Util.lib",
 				"role" : "libraries"
 			},
 			{
 				"backtrace" : 5,
-				"fragment" : "F:\\gitclone\\bupt_tasks\\task3.3\\openal\\lib\\OpenAL32.lib",
+				"fragment" : "F:\\gitclone\\bupt_tasks_new\\task3.3\\openal\\lib\\OpenAL32.lib",
 				"role" : "libraries"
 			},
 			{

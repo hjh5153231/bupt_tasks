@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "f:/gitclone/bupt_tasks/task3.3/build"
+			"value" : "f:/gitclone/bupt_tasks_new/task3.3/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -571,7 +571,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/gitclone/bupt_tasks/task3.3/build/CMakeFiles/pkgRedirects"
+			"value" : "F:/gitclone/bupt_tasks_new/task3.3/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -643,7 +643,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "F:/gitclone/bupt_tasks/task3.3"
+			"value" : "F:/gitclone/bupt_tasks_new/task3.3"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1291,7 +1291,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/gitclone/bupt_tasks/task3.3/build"
+			"value" : "F:/gitclone/bupt_tasks_new/task3.3/build"
 		},
 		{
 			"name" : "task3.1.b_IS_TOP_LEVEL",
@@ -1315,7 +1315,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "F:/gitclone/bupt_tasks/task3.3"
+			"value" : "F:/gitclone/bupt_tasks_new/task3.3"
 		}
 	],
 	"kind" : "cache",

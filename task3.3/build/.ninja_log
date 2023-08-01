@@ -1,4 +1,6 @@
 # ninja log v5
-0	1708	7124856275092982	CMakeFiles/main.dir/src/VideoThread.cpp.obj	1af8652f4cedfaa1
-4	1864	7124856276654499	CMakeFiles/main.dir/main.cpp.obj	dd9d2a9a5e359f0c
-1864	2436	7124856282302783	F:/gitclone/bupt_tasks/task3.3/bin/main.exe	76d32551df39aafb
+2	1608	7125633810035167	CMakeFiles/main.dir/src/VideoThread.cpp.obj	69118c64acccd00a
+7	1774	7125633811696382	CMakeFiles/main.dir/main.cpp.obj	49ce218d544cfd21
+1775	2256	7125633816469391	F:/gitclone/bupt_tasks_new/task3.3/bin/main.exe	b88c9ed13aad2db8
+3	1706	7125634365763216	CMakeFiles/main.dir/main.cpp.obj	49ce218d544cfd21
+1706	2212	7125634370779816	F:/gitclone/bupt_tasks_new/task3.3/bin/main.exe	b88c9ed13aad2db8

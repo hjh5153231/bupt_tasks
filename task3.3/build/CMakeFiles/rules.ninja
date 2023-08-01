@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = "C:\Program Files\CMake\bin\cmake.exe" --regenerate-during-build -SF:\gitclone\bupt_tasks\task3.3 -BF:\gitclone\bupt_tasks\task3.3\build
+  command = "C:\Program Files\CMake\bin\cmake.exe" --regenerate-during-build -SF:\gitclone\bupt_tasks_new\task3.3 -BF:\gitclone\bupt_tasks_new\task3.3\build
   description = Re-running CMake...
   generator = 1
 
