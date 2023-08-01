@@ -1,0 +1,20 @@
+[
+{
+  "directory": "F:/gitclone/task3.3/build",
+  "command": "D:\\compilers\\tdm-gcc\\bin\\g++.exe -IF:/gitclone/task3.3/include -IF:/gitclone/task3.3/ffmpeg/include -IF:/gitclone/task3.3/sdl/include -IF:/gitclone/task3.3/openal/include -g -o CMakeFiles\\main.dir\\main.cpp.obj -c F:\\gitclone\\task3.3\\main.cpp",
+  "file": "F:\\gitclone\\task3.3\\main.cpp",
+  "output": "CMakeFiles\\main.dir\\main.cpp.obj"
+},
+{
+  "directory": "F:/gitclone/task3.3/build",
+  "command": "D:\\compilers\\tdm-gcc\\bin\\g++.exe -IF:/gitclone/task3.3/include -IF:/gitclone/task3.3/ffmpeg/include -IF:/gitclone/task3.3/sdl/include -IF:/gitclone/task3.3/openal/include -g -o CMakeFiles\\main.dir\\src\\AudioPlayer.cpp.obj -c F:\\gitclone\\task3.3\\src\\AudioPlayer.cpp",
+  "file": "F:\\gitclone\\task3.3\\src\\AudioPlayer.cpp",
+  "output": "CMakeFiles\\main.dir\\src\\AudioPlayer.cpp.obj"
+},
+{
+  "directory": "F:/gitclone/task3.3/build",
+  "command": "D:\\compilers\\tdm-gcc\\bin\\g++.exe -IF:/gitclone/task3.3/include -IF:/gitclone/task3.3/ffmpeg/include -IF:/gitclone/task3.3/sdl/include -IF:/gitclone/task3.3/openal/include -g -o CMakeFiles\\main.dir\\src\\VideoPlayer.cpp.obj -c F:\\gitclone\\task3.3\\src\\VideoPlayer.cpp",
+  "file": "F:\\gitclone\\task3.3\\src\\VideoPlayer.cpp",
+  "output": "CMakeFiles\\main.dir\\src\\VideoPlayer.cpp.obj"
+}
+]
